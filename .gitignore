@@ -23,6 +23,7 @@ ghidra_exported/
 tools/360tools/
 tools/extract-xiso/
 tools/*
+!tools/re/
 !tools/*.py
 !tools/*.java
 !tools/rexglue

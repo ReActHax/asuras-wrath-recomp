@@ -268,3 +268,37 @@ asura_wrath_recomp --render_target_path_vulkan=fbo
 - [ ] Test for Windows (?)
 - [x] Make consistent builds
 - [x] Make it easier to build & run
+
+## Enhancements
+
+Game-specific options live in `src/asura_patches.cpp` as hooks on recompiled
+functions (nothing in `generated/` is edited). All of them are cvars: set them
+in `asura_wrath_recomp.toml` next to the executable (see
+`asura_wrath_recomp.example.toml`), pass them as `--name=value`, or change them
+live in the settings overlay (**F4**).
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `asura_60fps` | `false` | 60 FPS with correct game speed (present interval 2 → 1 and constant game-speed scale). **F6** toggles 30/60 live, e.g. for a mash QTE. |
+| `asura_disable_postprocess` | `false` | Skips the post-process passes that over-correct edges and smear colors at `resolution_scale` > 1. Changes the look. |
+| `input_press_latch` | `true` | A button press that starts and ends between two reads of the pad (stutter, frame drop, fast mashing) is replayed as its own press instead of being lost. |
+| `input_press_latch_max` | `6` | Presses buffered per button between two reads. |
+| `input_press_latch_hold_ms` | `12` | Minimum time a replayed edge stays visible, for code that polls several times per frame. |
+
+Useful engine options: `resolution_scale` (2 = 1440p, 3 = 2160p internal),
+`anisotropic_override=5` (16x), `user_language=4` (French), `vsync=true`
+(guest pacing follows the emulated 60 Hz vblank, independent of the monitor).
+
+Patch addresses come from the Xenia Canary game patch for this title (author:
+boma) and target the base XEX (`904B784109438B34`). `tools/re/` has small
+helpers to inspect the generated code: `fn.py sub_XXXXXXXX [-a]` prints a
+function (`-a`: PPC listing only), `addr.py 8XXXXXXX` finds the function that
+contains an address, `insn.py 8XXXXXXX` shows the C emitted for one
+instruction.
+
+### Windows startup crash (0xC0000409)
+
+`rex::filesystem::GetExecutablePath` used `_get_wpgmptr`, which is only set
+when the CRT entry point is `wmain`; otherwise the CRT invalid-parameter
+handler kills the process before anything is logged. The SDK fork now uses
+`GetModuleFileNameW`.

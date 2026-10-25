@@ -1,0 +1,36 @@
+# Copy next to asura_wrath_recomp.exe and rename to asura_wrath_recomp.toml.
+# Keys are flat cvar names; every one can also be passed as --name=value and
+# most can be changed live in the settings overlay (F4).
+
+# --- Language ---------------------------------------------------------------
+# Xbox 360 language IDs: 1 English, 2 Japanese, 3 German, 4 French,
+# 5 Spanish, 6 Italian, 7 Korean, 8 Traditional Chinese, 9 Portuguese.
+user_language = 4
+
+# --- Display ----------------------------------------------------------------
+fullscreen = true
+# Keep the guest video mode at 720p (what the game was built for) and scale
+# the rendering instead. 2 = 2560x1440 internal, 3 = 3840x2160.
+resolution_scale = 2
+# 5 = 16x anisotropic filtering.
+anisotropic_override = 5
+# Sharpening when the output is scaled to the window: bilinear, cas, fsr
+# (cas/fsr only when built with FidelityFX).
+present_effect = "bilinear"
+# Leave on: guest frame pacing follows the emulated 60 Hz vblank, whatever
+# the monitor's refresh rate (a 170 Hz screen does not speed the game up).
+vsync = true
+
+# --- Asura's Wrath enhancements (src/asura_patches.cpp) ---------------------
+# 60 FPS with correct game speed. Toggle live with F6 (bind_asura_toggle_fps).
+asura_60fps = true
+# Removes edge-detection over-correction / color smearing with
+# resolution_scale > 1, but changes the game's look. Off by default.
+asura_disable_postprocess = false
+
+# --- Input ------------------------------------------------------------------
+# Never lose a QTE press during a frame drop or stutter; mashes are replayed
+# as separate presses (up to input_press_latch_max per button per read).
+input_press_latch = true
+input_press_latch_max = 6
+input_press_latch_hold_ms = 12

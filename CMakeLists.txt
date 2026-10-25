@@ -53,11 +53,13 @@ include(generated/rexglue.cmake)
 if(ANDROID)
   set(ASURAWRATH_SOURCES
     src/main.cpp
+    src/asura_patches.cpp
     src/jni_input.cpp
 )
 else()
   set(ASURAWRATH_SOURCES
     src/main.cpp
+    src/asura_patches.cpp
 )
 endif()
 

@@ -8,6 +8,8 @@
 #include <rex/logging.h>
 #include <rex/rex_app.h>
 
+#include "asura_patches.h"
+
 #if defined(__ANDROID__)
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_hints.h>
@@ -171,7 +173,10 @@ public:
 #if defined(__ANDROID__)
     SetupVirtualGamepad();
 #endif
+    AsuraPatches_RegisterBinds();
   }
+
+  void OnShutdown() override { AsuraPatches_UnregisterBinds(); }
 
   void OnConfigurePaths(rex::PathConfig &paths) override {
     std::error_code ec;
