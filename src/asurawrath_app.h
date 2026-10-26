@@ -173,6 +173,7 @@ public:
 #if defined(__ANDROID__)
     SetupVirtualGamepad();
 #endif
+    AsuraPatches_Setup();
     AsuraPatches_RegisterBinds();
   }
 
@@ -310,5 +311,8 @@ public:
         }
       }
     }
+
+    // Before the runtime mounts game_data_root (see asura_patches.cpp).
+    AsuraPatches_PrepareGameData(paths.game_data_root);
   }
 };
