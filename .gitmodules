@@ -1,4 +1,3 @@
 [submodule "tools/rexglue"]
 	path = tools/rexglue
-	url = https://github.com/PauloUbirajara/asura-wrath-rexglue-sdk
-
+	url = https://github.com/ReActHax/asura-wrath-rexglue-sdk
