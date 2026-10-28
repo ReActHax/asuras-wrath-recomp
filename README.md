@@ -224,9 +224,9 @@ with this fork's changes.
   the god mode and instant burst cheats were reproduced.
 - **AMD** — FidelityFX (CAS, FSR).
 - **kenney.nl** — gamepad assets used by the original Android port.
-- **Aymeric (ReActHax)** — this fork: testing, direction, startup crash fix.
+- **ReActHax** — this fork: testing, direction, startup crash fix.
 - Most of this fork's code and documentation was written with the help of
-  **Claude** (Anthropic), an AI assistant, under Aymeric's direction and testing.
+  **Claude** (Anthropic), an AI assistant, under ReActHax's direction and testing.
 
 ---
 
