@@ -54,12 +54,18 @@ if(ANDROID)
   set(ASURAWRATH_SOURCES
     src/main.cpp
     src/asura_patches.cpp
+    src/asura_config_patch.cpp
+    src/asura_cheats.cpp
+    src/asura_trainer.cpp
     src/jni_input.cpp
 )
 else()
   set(ASURAWRATH_SOURCES
     src/main.cpp
     src/asura_patches.cpp
+    src/asura_config_patch.cpp
+    src/asura_cheats.cpp
+    src/asura_trainer.cpp
 )
 endif()
 

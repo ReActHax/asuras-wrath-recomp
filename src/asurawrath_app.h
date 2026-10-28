@@ -8,6 +8,7 @@
 #include <rex/logging.h>
 #include <rex/rex_app.h>
 
+#include "asura_cheats.h"
 #include "asura_patches.h"
 
 #if defined(__ANDROID__)
@@ -175,9 +176,19 @@ public:
 #endif
     AsuraPatches_Setup();
     AsuraPatches_RegisterBinds();
+    AsuraCheats_Init(user_data_root());
   }
 
-  void OnShutdown() override { AsuraPatches_UnregisterBinds(); }
+  void OnCreateDialogs(rex::ui::ImGuiDrawer *drawer) override {
+    AsuraCheats_RegisterBinds(drawer);
+  }
+
+  bool IsAppOverlayOpen() const override { return AsuraCheats_IsMenuOpen(); }
+
+  void OnShutdown() override {
+    AsuraCheats_Shutdown();
+    AsuraPatches_UnregisterBinds();
+  }
 
   void OnConfigurePaths(rex::PathConfig &paths) override {
     std::error_code ec;

@@ -19,6 +19,7 @@
 #include "generated/default/asura_wrath_init.h"
 
 #include <rex/cvar.h>
+#include <rex/input/flags.h>
 #include <rex/hook.h>
 #include <rex/logging.h>
 #include <rex/system/file_open_filter.h>
@@ -35,6 +36,7 @@
 #include <string_view>
 #include <vector>
 
+#include "asura_config_patch.h"
 #include "asura_patches.h"
 
 REXCVAR_DEFINE_BOOL(asura_60fps, false, "Asura",
@@ -218,6 +220,12 @@ std::optional<std::string> ShortenIntroLogo(std::string_view guest_path) {
   return std::string(directory) + "\\" + std::string(kShortLogoDir) + "\\" + std::string(name);
 }
 
+void ToggleTurbo() {
+  const bool enable = !REXCVAR_GET(input_turbo);
+  rex::cvar::SetFlagByName("input_turbo", enable ? "true" : "false");
+  REXLOG_INFO("Asura: turbo (hold to mash) {}", enable ? "on" : "off");
+}
+
 void ToggleFramerate() {
   const bool enable = !REXCVAR_GET(asura_60fps);
   rex::cvar::SetFlagByName("asura_60fps", enable ? "true" : "false");
@@ -271,20 +279,30 @@ REX_HOOK_RAW(sub_827404C0) {
 
 void AsuraPatches_PrepareGameData(const std::filesystem::path& game_data_root) {
   PrepareShortLogos(game_data_root);
+  AsuraConfig_Prepare(game_data_root);
 }
 
 void AsuraPatches_Setup() {
   REXLOG_INFO("Asura: {} shortened logo movies ready{}", g_short_logos.size(),
               g_short_logos_failed ? " (some could not be written)" : "");
-  rex::system::SetFileOpenFilter(ShortenIntroLogo);
+  AsuraConfig_LogStatus();
+  rex::system::SetFileOpenFilter([](std::string_view guest_path) -> std::optional<std::string> {
+    if (auto patched = AsuraConfig_Redirect(guest_path)) {
+      return patched;
+    }
+    return ShortenIntroLogo(guest_path);
+  });
 }
 
 void AsuraPatches_RegisterBinds() {
   rex::ui::RegisterBind("bind_asura_toggle_fps", "F6", "Toggle 30/60 FPS (Asura's Wrath)",
                         ToggleFramerate);
+  rex::ui::RegisterBind("bind_asura_toggle_turbo", "F8",
+                        "Toggle turbo: hold a button to mash it (Asura's Wrath)", ToggleTurbo);
 }
 
 void AsuraPatches_UnregisterBinds() {
   rex::system::SetFileOpenFilter(nullptr);
   rex::ui::UnregisterBind("bind_asura_toggle_fps");
+  rex::ui::UnregisterBind("bind_asura_toggle_turbo");
 }
