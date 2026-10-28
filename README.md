@@ -1,304 +1,242 @@
-# Asura's Wrath Recompiled
+# Asura's Wrath Recompiled — enhanced fork
 
-PC port of Asura's Wrath (`default.xex`, Title ID `43430817`) via Xbox 360 static PowerPC recompilation to C++23.
+[Français](README.fr.md)
 
-> Note: Android port is experimental, use on your own risk.
+<img alt="Asura's Wrath" src="https://github.com/user-attachments/assets/339f7f1b-85d4-48ac-9b5f-ac4fad276dad" />
 
-<a href="https://www.youtube.com/playlist?list=PLVyuezqTsTB0">
-        <img alt="cover" src="https://github.com/user-attachments/assets/339f7f1b-85d4-48ac-9b5f-ac4fad276dad" />
-</a>
+*Original illustration by Satoshi Sakai.*
 
-https://www.youtube.com/playlist?list=PLVyuezqTsTB0
+A native Windows PC version of **Asura's Wrath** (Xbox 360, title ID `43430817`),
+made by statically recompiling the original PowerPC executable to C++ with the
+[ReXGlue](https://github.com/rexglue/rexglue-sdk) SDK.
 
-> Original illustration by Satoshi Sakai
+This is a fork of [PauloUbirajara/asuras-wrath-recomp](https://github.com/PauloUbirajara/asuras-wrath-recomp)
+that adds stability fixes, title update 1 and DLC support, 60 FPS, quality of
+life options, a launcher/installer and texture replacement.
+
+> **No game files are included.** You need your own copy of the game (Xbox 360
+> disc image) and its title update 1.
+
+> **This project is not maintained.** It is published as is, as a finished
+> experiment. Issues and pull requests will probably not be answered — feel free
+> to fork it.
 
 ---
 
-## 1. Requirements
+## Contents
 
-- A copy of the Xbox 360 game ISO (`Asura's Wrath.iso`).
-- [extract-xiso](https://github.com/XboxDev/extract-xiso) tool to extract `.iso` contents.
-- CMake 3.25+ and Clang / Ninja compiler toolchain.
+1. [Features](#features)
+2. [Playing (download and install)](#playing-download-and-install)
+3. [Launcher and settings](#launcher-and-settings)
+4. [In-game keys](#in-game-keys)
+5. [Texture replacement (HD textures)](#texture-replacement-hd-textures)
+6. [Known issues](#known-issues)
+7. [Building from source](#building-from-source)
+8. [Project layout](#project-layout)
+9. [Credits](#credits)
+10. [Legal](#legal)
 
 ---
 
-## 2. Setup
+## Features
 
-### Clone Repository
-```bash
-git clone --recursive https://github.com/PauloUbirajara/asuras-wrath-recomp.git
+Compared to the original recompilation:
+
+**Fixes**
+- Startup crash on Windows (`0xC0000409`, executable path).
+- Random crashes (heap corruption): the controller list was rebuilt from
+  several threads without a lock.
+
+**Game content**
+- **Title update 1** built in (fixes soft locks, e.g. in episode 7).
+- **DLC**: packages are installed automatically at launch.
+
+**Enhancements**
+- **60 FPS** with the correct game speed (toggle 30/60 live with F6).
+- **QTE-friendly input**: no press is lost during a slowdown, and an optional
+  **turbo** (hold a button instead of mashing it) for mashing QTEs, which are
+  harder at 60 FPS.
+- **Skip the startup logos.**
+- **Effect toggles**: motion blur, depth of field, bloom, ambient occlusion,
+  light shafts, lens flares, distortion, radial blur, plus experimental sharper
+  textures and shadows.
+- **AMD FidelityFX** upscaling (CAS, FSR) and higher internal resolutions.
+- **Cheat menu (F9)**: memory search (Cheat Engine style), editable/frozen
+  values, god mode and instant burst.
+- **Texture replacement**: swap any texture with your own DDS file, at any
+  resolution — the base for HD texture packs (none is included).
+- **Launcher / installer**: installs the game files from your disc image and
+  edits the settings, in English or French.
+
+---
+
+## Playing (download and install)
+
+Requirements: Windows 10/11 64-bit, a DirectX 12 graphics card, about 7 GB of
+free space, and:
+
+- your **Asura's Wrath disc image** (`.iso`, Xbox 360);
+- **title update 1**, file `TU_11K620N_000000K000000.0000000000085`
+  (required: the recompiled code targets this version);
+- optionally your **DLC** packages (the files from `Content\0000000000000000\43430817\00000002`
+  on an Xbox 360 or from your backups).
+
+Steps:
+
+1. Download the latest `AsurasWrathRecompiled_windows_x64.zip` from the
+   [Releases page](https://github.com/ReActHax/asuras-wrath-recomp/releases).
+2. Extract it to a folder of your choice (not inside `Program Files`).
+3. Run **`AsuraLauncher.exe`**. On first launch it asks for the disc image,
+   the title update file and the DLC folder, then extracts and checks
+   everything (a few minutes).
+4. Adjust the settings if you like, then click **Play**.
+
+Saves, logs, DLC and textures are stored in `Documents\asura_wrath_recomp`.
+
+To update, extract a new release over the old folder: the game files
+(`extracted\`) and your settings (`asura_wrath_recomp.toml`) are kept.
+
+---
+
+## Launcher and settings
+
+`AsuraLauncher.exe` edits `asura_wrath_recomp.toml` next to the game (comments
+and unknown options are kept). Every option is explained in the launcher and in
+[`asura_wrath_recomp.example.toml`](asura_wrath_recomp.example.toml).
+
+| Tab | Options |
+| --- | --- |
+| Display | fullscreen, internal resolution (1×–3×), upscaling (bilinear, CAS, FSR), anisotropic filtering, vsync, renderer (D3D12/Vulkan), game language |
+| Game | 60 FPS, skip logos, disable post-processing |
+| Effects | motion blur, depth of field, bloom, ambient occlusion, light shafts, lens flares, distortion, radial blur, texture detail, high resolution shadows |
+| Controls | remember quick presses (QTE), turbo, turbo buttons and rate |
+| Textures | texture replacement, texture dump, open the textures folder |
+| About | in-game keys, data folder, install / repair the game files |
+
+Recommended: internal resolution 1× with **FSR 1** upscaling. Higher internal
+resolutions look sharper but cost a lot of performance, because the Xbox 360
+video memory (EDRAM) has to be emulated at that resolution.
+
+Every option can also be passed on the command line, for example
+`asura_wrath_recomp.exe --resolution_scale=2 --gpu_backend=d3d12`.
+
+---
+
+## In-game keys
+
+| Key | Action |
+| --- | --- |
+| F4 | Settings overlay |
+| F6 | Toggle 30 / 60 FPS |
+| F8 | Toggle turbo |
+| F9 | Cheat menu |
+| Alt+Enter | Fullscreen |
+
+---
+
+## Texture replacement (HD textures)
+
+Any 2D texture of the game can be replaced by a DDS file of any size: dump the
+textures, edit or upscale them, and drop them in `textures\replace`. No texture
+pack is included. See [docs/TEXTURE_MODDING.md](docs/TEXTURE_MODDING.md).
+
+---
+
+## Known issues
+
+- **Vulkan** shows many graphical glitches in this game (lighting, effects):
+  use Direct3D 12.
+- Internal resolutions above 1× are very demanding.
+- `fsr2` / `fsr3` are not true temporal upscalers here (no motion vectors).
+- `asura_fx_texture_detail` and `asura_fx_high_shadows` are experimental and
+  use more memory.
+- Ultrawide is not supported (fixed 720p game, HUD and cutscenes).
+
+---
+
+## Building from source
+
+For developers. Players should use the [releases](https://github.com/ReActHax/asuras-wrath-recomp/releases).
+
+Requirements:
+- Visual Studio 2022 (or Build Tools) with *Desktop development with C++*,
+  *C++ Clang tools for Windows* and *C++ CMake tools*;
+- Git;
+- the game files: your extracted disc image plus `default.xexp` from title
+  update 1, in `extracted\` at the repository root (the code generator reads
+  `extracted\default.xex` and applies `default.xexp`). The easiest way is to
+  let `AsuraLauncher.exe` from a release install them, then copy or link its
+  `extracted` folder.
+
+```bat
+git clone --recursive https://github.com/ReActHax/asuras-wrath-recomp.git
 cd asuras-wrath-recomp
+rem extracted\ must contain default.xex, default.xexp and BCGame\
+package_release.bat
 ```
 
----
+Run `package_release.bat` from the *Developer Command Prompt for VS 2022*. It
+configures and builds with CMake (preset `win-amd64-release`, D3D12 + Vulkan +
+FidelityFX), copies the game to `out\dist\asura_wrath_recomp_windows_x86_64`,
+builds the launcher with the C# compiler included in Windows and creates the
+release archive in `out\release`. The archive never contains game files.
 
-## 3. Build
+Manual build:
 
-> Requires the .iso contents in extracted/ to build.
-
-### Option A: Using CMake Presets (Linux / Windows / Android)
-
-#### Linux
-```bash
-cmake --preset linux-amd64-release
-cmake --build out/build/linux-amd64-release --parallel
-```
-
-#### Windows
-```cmd
-cmake --preset win-amd64-release
+```bat
+cmake --preset win-amd64-release -DREXGLUE_USE_VULKAN=ON -DREXGLUE_USE_D3D12=ON -DREXGLUE_ENABLE_FIDELITYFX=ON
 cmake --build out/build/win-amd64-release --parallel
 ```
 
-#### Android
-```bash
-cmake --preset android-aarch64-release
-cmake --build out/build/android-aarch64-release --parallel
-```
+Technical notes (how the patches work, addresses, pitfalls): [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+
+Linux and Android builds come from the original project and were not tested
+with this fork's changes.
 
 ---
 
-### Option B: Using Build Scripts
+## Project layout
 
-#### Linux
-```bash
-# Build binary
-./build.sh
-
-# Build binary and create release zip archive in out/ directory
-./build.sh --package
-
-# out/
-# ├── build
-# │   └── linux-amd64-release
-# └── dist
-#     ├── asura_wrath_recomp_linux_x86_64
-#     └── asura_wrath_recomp_linux_x86_64.zip
-```
-
-#### Windows
-```ps1
-# Build binary
-build.bat
-
-# Build binary and create release zip archive in out/ directory
-build.bat --package
-
-# out/
-# ├── build
-# │   └── win-amd64-release
-# └── dist
-#     ├── asura_wrath_recomp_win_amd64.exe
-#     └── asura_wrath_recomp_win_amd64.zip
-```
-
-#### Android
-```bash
-# Build release APK
-./build_android.sh
-
-# Build debug APK
-./build_android.sh --debug
-
-# out/dist/asura_wrath_recomp_android.apk
-```
+| Path | Contents |
+| --- | --- |
+| `src/asura_patches.cpp` | 60 FPS, post-process toggle, logo skip, hotkeys |
+| `src/asura_config_patch.cpp` | effect toggles (patched copies of the game's `Coalesced_*.bin` config) |
+| `src/asura_cheats.cpp` | F9 cheat menu and memory search |
+| `src/asura_trainer.cpp` | god mode and instant burst |
+| `src/asurawrath_app.h` | application entry, paths, game data preparation |
+| `includes/funcs.toml` | function addresses for title update 1 |
+| `generated/` | recompiled game code (from the code generator) |
+| `tools/rexglue` | ReXGlue SDK fork ([ReActHax/asura-wrath-rexglue-sdk](https://github.com/ReActHax/asura-wrath-rexglue-sdk)): texture replacement, turbo, DLC install, crash fixes… |
+| `tools/launcher` | `AsuraLauncher.cs` (launcher / installer) |
+| `tools/re` | small helpers to read the generated code |
+| `docs/` | texture modding guide, developer notes |
 
 ---
 
-## 4. Game Setup
+## Credits
 
-In the same directory as the executable, run the following:
-
-```bash
-# Extract Game ISO
-mkdir -p extracted/
-extract-xiso -x asura_wrath.iso -d extracted/
-
-# (Optional) Install DLC Content (Not supported/tested yet)
-```
-
-If extracted game is somewhere else, it can be specified via the `--game_data_root` argument:
-
-```bash
-asura_wrath_recomp --game_data_root=/path/to/extracted/game
-```
-
-Available ReXGlue Path Configuration Flags:
-| Flag | Description | Default |
-| - | - | - |
-| `--cache_root` | Directory for compiled Vulkan pipeline and shader storage. | `cache` |
-| `--game_data_root` | Root directory containing extracted game files. | `extracted` (if exists) or current directory |
-| `--metadata_root` | Directory for game metadata. | `(empty)` |
-| `--update_data_root` | Directory containing game update / DLC patches. | `(empty)` |
-| `--user_data_root` | Directory for user save games and profile data. | `%USERPROFILE%\Documents\asura_wrath_recomp` (Windows) |
-| `--user_data_root` | Directory for user save games and profile data. | `~/.local/share/asura_wrath_recomp` (Linux) |
+- **PauloUbirajara** — original Asura's Wrath recompilation and SDK fork.
+- **Tom Clay and contributors** — [ReXGlue](https://github.com/rexglue/rexglue-sdk) SDK.
+- **Ben Vanik and the Xenia contributors** — [Xenia](https://github.com/xenia-project/xenia), on which the ReXGlue runtime is based.
+- **boma** — Xenia Canary game patches for Asura's Wrath (60 FPS, post-process),
+  used to find the patched functions ([xenia-canary/game-patches](https://github.com/xenia-canary/game-patches)).
+- **AxR / RETROBYTE / XYZEngine** — Aurora trainer for Asura's Wrath, from which
+  the god mode and instant burst cheats were reproduced.
+- **AMD** — FidelityFX (CAS, FSR).
+- **kenney.nl** — gamepad assets used by the original Android port.
+- **Aymeric (ReActHax)** — this fork: testing, direction, startup crash fix.
+- Most of this fork's code and documentation was written with the help of
+  **Claude** (Anthropic), an AI assistant, under Aymeric's direction and testing.
 
 ---
 
-## 5. Run
+## Legal
 
-### Expected Folder Structure Before Running
+Asura's Wrath is © CAPCOM CO., LTD. This project is not affiliated with or
+endorsed by Capcom, CyberConnect2 or Microsoft. No game assets are distributed:
+you must own the game and provide your own disc image and title update. Do not
+use this project for piracy.
 
-#### Linux
-```
-├── asura_wrath_recomp  # Executable
-├── extracted/          # .iso contents 
-├── librexgpu-xenos.so
-├── librexruntime.so
-└── libTracyClient.so
-```
-
-#### Windows
-```
-├── asura_wrath_recomp.exe # Executable
-├── extracted/             # .iso contents 
-├── rexgpu-xenos.dll
-├── rexruntime.dll
-└── TracyClient.dll
-```
-
-### Save Locations
-
-| OS | Location |
-| :--- | :--- |
-| Linux | `~/.local/share/asura_wrath_recomp` |
-| Windows | `%USERPROFILE%\Documents\asura_wrath_recomp\` |
-| Android | `<user picks the save location>` |
-
-### Linux
-```bash
-asura_wrath_recomp
-
-# Linux (What currently works best for me)
-asura_wrath_recomp \
-    --async_shader_compilation=true \
-    --render_target_path_vulkan=fsi \
-    --vulkan_async_skip_incomplete_frames=true \
-    --vulkan_device=1 \
-    --vulkan_pipeline_creation_threads=6 \
-    --window_height=1080 \
-    --window_width=1920
-```
-
-### Windows
-```cmd
-asura_wrath_recomp.exe
-```
-
-### Android
-```bash
-# Install the game on your phone/emulator
-adb install -r out/dist/asura_wrath_recomp_android.apk
-
-# Run the game
-adb shell am start -n asura_wrath.recomp/.MainActivity
-```
-
-## 6. Custom Run Flags
-
-#### Custom Backend
-```cmd
-asura_wrath_recomp.exe --gpu_backend=vulkan
-asura_wrath_recomp.exe --gpu_backend=d3d12
-```
-
-#### Custom Resolution
-```bash
-asura_wrath_recomp --window_width=1920 --window_height=1080
-```
-
-#### Selecting GPU Device
-
-List available GPUs and their index numbers on your system:
-```bash
-vulkaninfo --summary | grep -E 'GPU[0-9]+:|deviceName'
-```
-
-Output:
-```text
-GPU0:
-        deviceName         = Intel(R) UHD Graphics (CML GT2)
-GPU1:
-        deviceName         = NVIDIA GeForce GTX 1650
-GPU2:
-        deviceName         = llvmpipe (LLVM 20.1.8, 256 bits)
-```
-
-Pass `--vulkan_device=<index>` to target a specific GPU (e.g., index `1` for discrete NVIDIA GPU):
-```bash
-asura_wrath_recomp --vulkan_device=1
-```
-
-#### Render Target Path (`fsi` vs `fbo`)
-
-- `fbo`: Host framebuffers (default, higher performance, can produce color artifacts on some GPUs).
-- `fsi`: Fragment Shader Interlock (software EDRAM pixel packing, fixes red overlay artifacts on NVIDIA GPUs).
-
-Fix red overlay artifact on NVIDIA GPUs:
-```bash
-asura_wrath_recomp --vulkan_device=1 --render_target_path_vulkan=fsi
-```
-
-Switch back to host framebuffers:
-```bash
-asura_wrath_recomp --render_target_path_vulkan=fbo
-```
-
----
-
-## 7. Credits
-
-- Powered by **ReXGlue** (https://github.com/rexglue/rexglue-sdk), an open-source static recompilation framework for Xbox 360 software.
-- UI touch controls made possible by using **kenney.nl** Xbox gamepad assets (https://kenney.nl/assets/input-prompts)
-
----
-
-## 8. Issues
-
-- Had to use FSI over FBO to avoid red artifacts (performance loss / stutters due to on-demand texture / shader compilation - also seen in https://github.com/rexglue/rexglue-sdk/blob/71782a3bc15cd1994381757fae7d616242f22e6a/src/graphics/vulkan/render_target_cache.cpp#L44-L63)
-
----
-
-## 9. TODO
-
-- [ ] Add touch controls for Android (?)
-- [ ] Improve performance
-- [ ] Make DLCs work
-- [ ] Test for Android (?)
-- [ ] Test for Windows (?)
-- [x] Make consistent builds
-- [x] Make it easier to build & run
-
-## Enhancements
-
-Game-specific options live in `src/asura_patches.cpp` as hooks on recompiled
-functions (nothing in `generated/` is edited). All of them are cvars: set them
-in `asura_wrath_recomp.toml` next to the executable (see
-`asura_wrath_recomp.example.toml`), pass them as `--name=value`, or change them
-live in the settings overlay (**F4**).
-
-| Option | Default | What it does |
-| --- | --- | --- |
-| `asura_60fps` | `false` | 60 FPS with correct game speed (present interval 2 → 1 and constant game-speed scale). **F6** toggles 30/60 live, e.g. for a mash QTE. |
-| `asura_disable_postprocess` | `false` | Skips the post-process passes that over-correct edges and smear colors at `resolution_scale` > 1. Changes the look. |
-| `input_press_latch` | `true` | A button press that starts and ends between two reads of the pad (stutter, frame drop, fast mashing) is replayed as its own press instead of being lost. |
-| `input_press_latch_max` | `6` | Presses buffered per button between two reads. |
-| `input_press_latch_hold_ms` | `12` | Minimum time a replayed edge stays visible, for code that polls several times per frame. |
-
-Useful engine options: `resolution_scale` (2 = 1440p, 3 = 2160p internal),
-`anisotropic_override=5` (16x), `user_language=4` (French), `vsync=true`
-(guest pacing follows the emulated 60 Hz vblank, independent of the monitor).
-
-Patch addresses come from the Xenia Canary game patch for this title (author:
-boma) and target the base XEX (`904B784109438B34`). `tools/re/` has small
-helpers to inspect the generated code: `fn.py sub_XXXXXXXX [-a]` prints a
-function (`-a`: PPC listing only), `addr.py 8XXXXXXX` finds the function that
-contains an address, `insn.py 8XXXXXXX` shows the C emitted for one
-instruction.
-
-### Windows startup crash (0xC0000409)
-
-`rex::filesystem::GetExecutablePath` used `_get_wpgmptr`, which is only set
-when the CRT entry point is `wmain`; otherwise the CRT invalid-parameter
-handler kills the process before anything is logged. The SDK fork now uses
-`GetModuleFileNameW`.
+The original project has no license file; the ReXGlue SDK and Xenia are under
+the BSD 3-Clause license (see `tools/rexglue/LICENSE`). This fork's own changes
+are provided as is, without warranty.

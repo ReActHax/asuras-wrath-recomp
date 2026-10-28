@@ -1,36 +1,84 @@
-# Copy next to asura_wrath_recomp.exe and rename to asura_wrath_recomp.toml.
-# Keys are flat cvar names; every one can also be passed as --name=value and
-# most can be changed live in the settings overlay (F4).
+# Asura's Wrath Recompiled - settings.
+#
+# AsuraLauncher.exe creates and edits asura_wrath_recomp.toml (next to the
+# executable) for you; this file documents every option it uses, plus a few
+# advanced ones. To use it by hand, copy it next to asura_wrath_recomp.exe and
+# rename it to asura_wrath_recomp.toml.
+#
+# Keys are flat names; every one can also be passed on the command line as
+# --name=value, and most can be changed live in the settings overlay (F4).
 
 # --- Language ---------------------------------------------------------------
-# Xbox 360 language IDs: 1 English, 2 Japanese, 3 German, 4 French,
-# 5 Spanish, 6 Italian, 7 Korean, 8 Traditional Chinese, 9 Portuguese.
-user_language = 4
+# Text and menus. Languages present in the game: 1 English, 2 Japanese,
+# 3 German, 4 French, 5 Spanish, 6 Italian.
+user_language = 1
 
 # --- Display ----------------------------------------------------------------
 fullscreen = true
-# Keep the guest video mode at 720p (what the game was built for) and scale
-# the rendering instead. 2 = 2560x1440 internal, 3 = 3840x2160.
-resolution_scale = 2
-# 5 = 16x anisotropic filtering.
-anisotropic_override = 5
-# Sharpening when the output is scaled to the window: bilinear, cas, fsr
-# (cas/fsr only when built with FidelityFX).
+# Renderer: "d3d12" (recommended) or "vulkan" (graphical glitches in this game).
+gpu_backend = "d3d12"
+# Internal resolution: 1 = 1280x720 (original), 2 = 2560x1440, 3 = 3840x2160.
+# Above 1 is very demanding (Xbox 360 video memory emulation); prefer 1 with
+# present_effect = "fsr".
+resolution_scale = 1
+# How the image is scaled to the window: "bilinear" (original), "cas",
+# "fsr" (FSR 1), "fsr2", "fsr3" (the last two are not true temporal upscalers
+# here: the game has no motion vectors).
 present_effect = "bilinear"
-# Leave on: guest frame pacing follows the emulated 60 Hz vblank, whatever
-# the monitor's refresh rate (a 170 Hz screen does not speed the game up).
+# Anisotropic filtering: -1 = game default, 0 = off, 1..5 = 1x, 2x, 4x, 8x, 16x.
+anisotropic_override = 5
+# Keep it on: game pacing follows the emulated 60 Hz vblank, whatever the
+# monitor's refresh rate.
 vsync = true
 
-# --- Asura's Wrath enhancements (src/asura_patches.cpp) ---------------------
-# 60 FPS with correct game speed. Toggle live with F6 (bind_asura_toggle_fps).
+# --- Game enhancements (src/asura_patches.cpp) -------------------------------
+# 60 FPS with the correct game speed. F6 toggles 30/60 in game.
 asura_60fps = true
-# Removes edge-detection over-correction / color smearing with
-# resolution_scale > 1, but changes the game's look. Off by default.
+# Skip the studio logo movies at startup.
+asura_skip_logos = true
+# Skip the post-process passes (edge over-sharpening / color smearing that
+# show at resolution_scale > 1). Changes the look of the game.
 asura_disable_postprocess = false
 
+# --- Effects (src/asura_config_patch.cpp) -----------------------------------
+# true = as in the original game. Applied at the next launch.
+asura_fx_motion_blur = true
+asura_fx_depth_of_field = true
+asura_fx_bloom = true
+asura_fx_ambient_occlusion = true
+asura_fx_light_shafts = true
+asura_fx_lens_flares = true
+asura_fx_distortion = true
+asura_fx_radial_blur = true
+# EXPERIMENTAL. 0 = original texture sharpness, up to 3 = full resolution
+# (uses more memory: lower it if the game crashes).
+asura_fx_texture_detail = 0
+# EXPERIMENTAL. Shadow map limit 2048 instead of 1120.
+asura_fx_high_shadows = false
+
 # --- Input ------------------------------------------------------------------
-# Never lose a QTE press during a frame drop or stutter; mashes are replayed
-# as separate presses (up to input_press_latch_max per button per read).
+# Never lose a QTE press during a frame drop or stutter: a press that starts
+# and ends between two reads of the pad is replayed to the game.
 input_press_latch = true
 input_press_latch_max = 6
 input_press_latch_hold_ms = 12
+# Turbo: holding a listed button presses it repeatedly (F8 toggles in game).
+# The game was designed for 30 FPS; at 60 FPS button-mashing QTEs are harder.
+# B covers the mashing QTEs and keeps Y free for rapid fire.
+input_turbo = true
+input_turbo_buttons = "B"
+input_turbo_rate_hz = 12
+input_turbo_delay_ms = 250
+
+# --- Texture replacement (docs/TEXTURE_MODDING.md) ---------------------------
+# Use the DDS files of <user data>/textures/replace (none are included).
+texture_replacement = true
+# Save every texture the game loads to <user data>/textures/dump (modders only,
+# slows the game down).
+texture_dump = false
+
+# --- Paths (advanced) -------------------------------------------------------
+# Defaults: game files in "extracted" next to the executable, user data
+# (saves, logs, DLC, textures) in Documents\asura_wrath_recomp.
+# game_data_root = "extracted"
+# user_data_root = "D:/AsuraData"
