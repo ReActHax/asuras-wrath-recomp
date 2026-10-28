@@ -1,21 +1,27 @@
+# Never commit game files, title updates, DLC, trainers or user settings.
+
 # Xbox 360 GOD / STFS Package Content Folders
 43430817/
 00000001/
+00000002/
 00007000/
 [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/
+TU_*
 
 # Raw Binary Images, Decrypted Executables & Game Data
 *.iso
 *.god
 *.stfs
 *.xex
+*.xexp
 *.pe
 *.bin
 *.dat
 *.toc
 asura_wrath.iso
 
-# Extracted Game Filesystem & Ghidra Exported Source
+# Extracted Game Filesystem (folder or junction) & Ghidra Exported Source
+extracted
 extracted/
 ghidra_exported/
 
@@ -24,6 +30,7 @@ tools/360tools/
 tools/extract-xiso/
 tools/*
 !tools/re/
+!tools/launcher/
 !tools/*.py
 !tools/*.java
 !tools/rexglue
@@ -34,6 +41,8 @@ generated/*/codegen.*
 build/
 build_win32/
 build_native/
+out/
+bin/
 dist/
 AppDir/
 *.AppImage
@@ -45,6 +54,8 @@ AppDir/
 *.so
 *.dll
 *.exe
+*.pdb
+*.dmp
 
 # IPS & Binary Patch Files
 *.ips
@@ -54,10 +65,17 @@ AppDir/
 *.mp4
 converted_movies/
 
-# Logs & Temporary Files
+# Textures (dumps and replacement packs)
+*.dds
+
+# Logs, Local Settings & Temporary Files
 scratch/
 logs/
 *.log
+asura_wrath_recomp.toml
+AsuraLauncher.ini
+asura_cheats.txt
+NOTES_DEV.md
 .DS_Store
 .vscode/
 .idea/
